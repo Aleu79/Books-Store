@@ -6,7 +6,7 @@ import (
 )
 
 // Esto permite desacoplar la lógica de acceso a datos del resto de la aplicación
-type Store interface {
+type BookStore interface {
 	GetAll() ([]*model.Book, error)
 	SearchByTitleOrAuthor(book string) ([]*model.Book, error)
 	GetByID(id int) (*model.Book, error)
@@ -16,19 +16,12 @@ type Store interface {
 	Delete(id int) error
 }
 
-// storeSQL es la implementación de la interfaz Store usando una base de datos SQL
-type storeSQL struct {
+type bookSQL struct {
 	db *sql.DB
 }
 
-// New crea una nueva instancia de storeSQL, inyectando una conexión *sql.DB
-// Retorna un Store, permitiendo usar esta implementación donde se requiera la interfaz
-func New(db *sql.DB) Store {
-	return &storeSQL{db: db}
-}
-
 // GetAll obtiene todos los libros de la base de datos
-func (s *storeSQL) GetAll() ([]*model.Book, error) {
+func (s *bookSQL) GetAll() ([]*model.Book, error) {
 	q := "SELECT id, title, author FROM books"
 	rows, err := s.db.Query(q)
 	if err != nil {
@@ -50,7 +43,7 @@ func (s *storeSQL) GetAll() ([]*model.Book, error) {
 }
 
 // SearchByTitleOrAuthor busca libros cuyo título o autor contenga la palabra indicada
-func (s *storeSQL) SearchByTitleOrAuthor(book string) ([]*model.Book, error) {
+func (s *bookSQL) SearchByTitleOrAuthor(book string) ([]*model.Book, error) {
 	q := "SELECT id, title, author FROM books WHERE title LIKE ? OR author LIKE ?"
 
 	// Usamos % para permitir coincidencias parciales (ej. "harry" → "Harry Potter")
@@ -73,7 +66,7 @@ func (s *storeSQL) SearchByTitleOrAuthor(book string) ([]*model.Book, error) {
 }
 
 // GetByID busca un libro por su ID
-func (s *storeSQL) GetByID(id int) (*model.Book, error) {
+func (s *bookSQL) GetByID(id int) (*model.Book, error) {
 	q := "SELECT id, title, author FROM books WHERE id = ?"
 
 	b := &model.Book{}
@@ -86,7 +79,7 @@ func (s *storeSQL) GetByID(id int) (*model.Book, error) {
 
 // Exists verifica si un libro con el ID dado existe en la base de datos
 // Usamos SELECT 1 por eficiencia (no se cargan todos los campos)
-func (s *storeSQL) Exists(id int) (bool, error) {
+func (s *bookSQL) Exists(id int) (bool, error) {
 	q := "SELECT 1 FROM books WHERE id = ?"
 	row := s.db.QueryRow(q, id)
 
@@ -103,7 +96,7 @@ func (s *storeSQL) Exists(id int) (bool, error) {
 }
 
 // Create inserta un nuevo libro en la base de datos
-func (s *storeSQL) Create(libro *model.Book) (*model.Book, error) {
+func (s *bookSQL) Create(libro *model.Book) (*model.Book, error) {
 	q := "INSERT INTO books (title, author) VALUES (?, ?)"
 	resp, err := s.db.Exec(q, libro.Titulo, libro.Autor)
 	if err != nil {
@@ -121,7 +114,7 @@ func (s *storeSQL) Create(libro *model.Book) (*model.Book, error) {
 }
 
 // Update actualiza los datos de un libro existente
-func (s *storeSQL) Update(id int, libro *model.Book) (*model.Book, error) {
+func (s *bookSQL) Update(id int, libro *model.Book) (*model.Book, error) {
 	q := "UPDATE books SET title = ?, author = ? WHERE id = ?"
 
 	_, err := s.db.Exec(q, libro.Titulo, libro.Autor, id)
@@ -134,7 +127,7 @@ func (s *storeSQL) Update(id int, libro *model.Book) (*model.Book, error) {
 }
 
 // Delete elimina un libro de la base de datos por su ID
-func (s *storeSQL) Delete(id int) error {
+func (s *bookSQL) Delete(id int) error {
 	q := "DELETE FROM books WHERE id = ?"
 
 	_, err := s.db.Exec(q, id)

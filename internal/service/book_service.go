@@ -24,7 +24,7 @@ func New(s store.Store) *Service {
 
 // GetAllBooks obtiene todos los libros disponibles desde el almacenamiento.
 func (s *Service) GetAllBooks() ([]*model.Book, error) {
-	return s.store.GetAll()
+	return s.store.BookStorage.GetAll()
 }
 
 // SearchByTitleOrAuthor busca libros cuyo título o autor contengan el término indicado.
@@ -33,7 +33,7 @@ func (s *Service) SearchByTitleOrAuthor(term string) ([]*model.Book, error) {
 	if term == "" {
 		return nil, errors.New("el término de búsqueda no puede quedar vacío")
 	}
-	return s.store.SearchByTitleOrAuthor(term)
+	return s.store.BookStorage.SearchByTitleOrAuthor(term)
 }
 
 // GetBookByID obtiene un libro específico según su ID.
@@ -42,7 +42,7 @@ func (s *Service) GetBookByID(id int) (*model.Book, error) {
 		return nil, errors.New("el id debe ser positivo")
 	}
 
-	book, err := s.store.GetByID(id)
+	book, err := s.store.BookStorage.GetByID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (s *Service) BookExists(id int) (bool, error) {
 	if id <= 0 {
 		return false, errors.New("el id debe ser positivo")
 	}
-	return s.store.Exists(id)
+	return s.store.BookStorage.Exists(id)
 }
 
 // CreateBook crea un nuevo libro en la base de datos, validando sus datos antes.
@@ -65,7 +65,7 @@ func (s *Service) CreateBook(libro model.Book) (*model.Book, error) {
 	if err := validateBook(&libro); err != nil {
 		return nil, err
 	}
-	return s.store.Create(&libro)
+	return s.store.BookStorage.Create(&libro)
 }
 
 // UpdateBook actualiza los datos de un libro existente por ID.
@@ -78,7 +78,7 @@ func (s *Service) UpdateBook(id int, libro model.Book) (*model.Book, error) {
 		return nil, err
 	}
 
-	existing, err := s.store.SearchByTitleOrAuthor(libro.Titulo)
+	existing, err := s.store.BookStorage.SearchByTitleOrAuthor(libro.Titulo)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (s *Service) UpdateBook(id int, libro model.Book) (*model.Book, error) {
 		return nil, errors.New("ya existe un libro con ese título")
 	}
 
-	return s.store.Update(id, &libro)
+	return s.store.BookStorage.Update(id, &libro)
 }
 
 // DeleteBook elimina un libro existente según su ID.
@@ -95,7 +95,7 @@ func (s *Service) DeleteBook(id int) error {
 		return errors.New("el id debe ser positivo")
 	}
 
-	exists, err := s.store.Exists(id)
+	exists, err := s.store.BookStorage.Exists(id)
 	if err != nil {
 		return err
 	}
@@ -103,7 +103,7 @@ func (s *Service) DeleteBook(id int) error {
 		return errors.New("no se puede eliminar: el libro no existe")
 	}
 
-	return s.store.Delete(id)
+	return s.store.BookStorage.Delete(id)
 }
 
 // validateBook realiza validaciones de negocio sobre los datos del libro.
