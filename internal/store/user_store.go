@@ -11,7 +11,7 @@ type UserStore interface {
 	GetByEmailOrUser(user string) (*model.User, error)
 	Exists(id int) (bool, error)
 	CreateUser(user *model.User) (*model.User, error)
-	Update(id int, book *model.User) (*model.User, error)
+	Update(id int, user *model.User) (*model.User, error)
 	Delete(id int) error
 }
 
