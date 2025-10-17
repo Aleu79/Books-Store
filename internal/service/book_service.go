@@ -11,24 +11,24 @@ import (
 // Service representa la capa de negocio de la aplicación.
 // Encapsula la lógica de validación y delega las operaciones
 // de persistencia en la capa store (base de datos).
-type Service struct {
+type BookService struct {
 	store store.Store
 }
 
 // New crea una nueva instancia del servicio, recibiendo un store como dependencia.
-func New(s store.Store) *Service {
-	return &Service{
+func NewBook(s store.Store) *BookService {
+	return &BookService{
 		store: s,
 	}
 }
 
 // GetAllBooks obtiene todos los libros disponibles desde el almacenamiento.
-func (s *Service) GetAllBooks() ([]*model.Book, error) {
+func (s *BookService) GetAllBooks() ([]*model.Book, error) {
 	return s.store.BookStorage.GetAll()
 }
 
 // SearchByTitleOrAuthor busca libros cuyo título o autor contengan el término indicado.
-func (s *Service) SearchByTitleOrAuthor(term string) ([]*model.Book, error) {
+func (s *BookService) SearchByTitleOrAuthor(term string) ([]*model.Book, error) {
 	term = strings.TrimSpace(term)
 	if term == "" {
 		return nil, errors.New("el término de búsqueda no puede quedar vacío")
@@ -37,7 +37,7 @@ func (s *Service) SearchByTitleOrAuthor(term string) ([]*model.Book, error) {
 }
 
 // GetBookByID obtiene un libro específico según su ID.
-func (s *Service) GetBookByID(id int) (*model.Book, error) {
+func (s *BookService) GetBookByID(id int) (*model.Book, error) {
 	if id <= 0 {
 		return nil, errors.New("el id debe ser positivo")
 	}
@@ -53,7 +53,7 @@ func (s *Service) GetBookByID(id int) (*model.Book, error) {
 }
 
 // BookExists verifica si existe un libro con el ID dado.
-func (s *Service) BookExists(id int) (bool, error) {
+func (s *BookService) BookExists(id int) (bool, error) {
 	if id <= 0 {
 		return false, errors.New("el id debe ser positivo")
 	}
@@ -61,7 +61,7 @@ func (s *Service) BookExists(id int) (bool, error) {
 }
 
 // CreateBook crea un nuevo libro en la base de datos, validando sus datos antes.
-func (s *Service) CreateBook(libro model.Book) (*model.Book, error) {
+func (s *BookService) CreateBook(libro model.Book) (*model.Book, error) {
 	if err := validateBook(&libro); err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (s *Service) CreateBook(libro model.Book) (*model.Book, error) {
 }
 
 // UpdateBook actualiza los datos de un libro existente por ID.
-func (s *Service) UpdateBook(id int, libro model.Book) (*model.Book, error) {
+func (s *BookService) UpdateBook(id int, libro model.Book) (*model.Book, error) {
 	if id <= 0 {
 		return nil, errors.New("el id debe ser positivo")
 	}
@@ -90,7 +90,7 @@ func (s *Service) UpdateBook(id int, libro model.Book) (*model.Book, error) {
 }
 
 // DeleteBook elimina un libro existente según su ID.
-func (s *Service) DeleteBook(id int) error {
+func (s *BookService) DeleteBook(id int) error {
 	if id <= 0 {
 		return errors.New("el id debe ser positivo")
 	}

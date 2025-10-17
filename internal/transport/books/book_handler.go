@@ -11,10 +11,10 @@ import (
 )
 
 type BookHandler struct {
-	service *service.Service
+	service *service.BookService
 }
 
-func New(s *service.Service) *BookHandler {
+func New(s *service.BookService) *BookHandler {
 	return &BookHandler{service: s}
 }
 

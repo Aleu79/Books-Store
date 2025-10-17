@@ -8,9 +8,9 @@ import (
 type UserStore interface {
 	GetAllUser() ([]*model.User, error)
 	SearchByUserOrEmail(user string) ([]*model.User, error)
-	CreateUser(user *model.User) (*model.User, error)
 	GetByEmailOrUser(user string) (*model.User, error)
 	Exists(id int) (bool, error)
+	CreateUser(user *model.User) (*model.User, error)
 	Update(id int, book *model.User) (*model.User, error)
 	Delete(id int) error
 }
