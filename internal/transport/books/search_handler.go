@@ -17,7 +17,7 @@ func (h *BookHandler) HandleSearchBooks(w http.ResponseWriter, r *http.Request) 
 		transport.WriteError(w, http.StatusBadRequest, "el término de búsqueda no puede quedar vacío")
 		return
 	}
-	results, err := h.service.SearchByTitleOrAuthor(query)
+	results, err := h.service.SearchBookByTitleOrAuthor(query)
 	if err != nil {
 		transport.WriteError(w, http.StatusInternalServerError, err.Error())
 		return

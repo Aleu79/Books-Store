@@ -105,8 +105,8 @@ func (s *userSQL) Exists(id int) (bool, error) {
 }
 
 func (s *userSQL) Update(id int, user *model.User) (*model.User, error) {
-	q := "UPDATE users SET username=?, email=?, role=? WHERE id=?"
-	_, err := s.db.Exec(q, user.Username, user.Email, user.Role, id)
+	q := "UPDATE users SET username=?, email=?, role=?, password=? WHERE id=?"
+	_, err := s.db.Exec(q, user.Username, user.Email, user.Role, user.Password, id)
 	if err != nil {
 		return nil, err
 	}

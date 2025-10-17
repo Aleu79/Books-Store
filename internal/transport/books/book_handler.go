@@ -34,7 +34,7 @@ func (h *BookHandler) HandleBooks(w http.ResponseWriter, r *http.Request) {
 			transport.WriteError(w, http.StatusBadRequest, "input inválido")
 			return
 		}
-		created, err := h.service.CreateBook(libro)
+		created, err := h.service.CreateBook(&libro)
 		if err != nil {
 			transport.WriteError(w, http.StatusBadRequest, err.Error())
 			return
@@ -69,7 +69,7 @@ func (h *BookHandler) HandleBookByID(w http.ResponseWriter, r *http.Request) {
 			transport.WriteError(w, http.StatusBadRequest, "input inválido")
 			return
 		}
-		updated, err := h.service.UpdateBook(id, libro)
+		updated, err := h.service.UpdateBook(id, &libro)
 		if err != nil {
 			transport.WriteError(w, http.StatusBadRequest, err.Error())
 			return
