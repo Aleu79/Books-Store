@@ -7,7 +7,7 @@ El objetivo del proyecto es implementar un sistema modular y escalable para gest
 
 ## 🧠 Estructura del proyecto
 
-```bash
+```
 practica-go/
 ├── 📁 internal/
 │   ├── 📁 model/

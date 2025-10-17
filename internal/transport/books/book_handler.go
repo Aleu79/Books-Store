@@ -1,10 +1,11 @@
-package transport
+package books
 
 import (
 	"encoding/json"
 	"net/http"
 	"practica-go/internal/model"
 	"practica-go/internal/service"
+	"practica-go/internal/transport"
 	"strconv"
 	"strings"
 )
@@ -23,24 +24,24 @@ func (h *BookHandler) HandleBooks(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		libros, err := h.service.GetAllBooks()
 		if err != nil {
-			writeError(w, http.StatusInternalServerError, err.Error())
+			transport.WriteError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		writeJSON(w, http.StatusOK, map[string]any{"books": libros})
+		transport.WriteJSON(w, http.StatusOK, map[string]any{"books": libros})
 	case http.MethodPost:
 		var libro model.Book
 		if err := json.NewDecoder(r.Body).Decode(&libro); err != nil {
-			writeError(w, http.StatusBadRequest, "input inválido")
+			transport.WriteError(w, http.StatusBadRequest, "input inválido")
 			return
 		}
 		created, err := h.service.CreateBook(libro)
 		if err != nil {
-			writeError(w, http.StatusBadRequest, err.Error())
+			transport.WriteError(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		writeJSON(w, http.StatusCreated, map[string]any{"book": created})
+		transport.WriteJSON(w, http.StatusCreated, map[string]any{"book": created})
 	default:
-		writeError(w, http.StatusMethodNotAllowed, "método no permitido")
+		transport.WriteError(w, http.StatusMethodNotAllowed, "método no permitido")
 	}
 }
 
@@ -49,7 +50,7 @@ func (h *BookHandler) HandleBookByID(w http.ResponseWriter, r *http.Request) {
 	idStr := strings.TrimPrefix(r.URL.Path, "/books/")
 	id, err := strconv.Atoi(idStr)
 	if err != nil || id <= 0 {
-		writeError(w, http.StatusBadRequest, "id inválido")
+		transport.WriteError(w, http.StatusBadRequest, "id inválido")
 		return
 	}
 
@@ -57,31 +58,31 @@ func (h *BookHandler) HandleBookByID(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		libro, err := h.service.GetBookByID(id)
 		if err != nil {
-			writeError(w, http.StatusNotFound, err.Error())
+			transport.WriteError(w, http.StatusNotFound, err.Error())
 			return
 		}
-		writeJSON(w, http.StatusOK, map[string]any{"book": libro})
+		transport.WriteJSON(w, http.StatusOK, map[string]any{"book": libro})
 
 	case http.MethodPut:
 		var libro model.Book
 		if err := json.NewDecoder(r.Body).Decode(&libro); err != nil {
-			writeError(w, http.StatusBadRequest, "input inválido")
+			transport.WriteError(w, http.StatusBadRequest, "input inválido")
 			return
 		}
 		updated, err := h.service.UpdateBook(id, libro)
 		if err != nil {
-			writeError(w, http.StatusBadRequest, err.Error())
+			transport.WriteError(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		writeJSON(w, http.StatusOK, map[string]any{"book": updated})
+		transport.WriteJSON(w, http.StatusOK, map[string]any{"book": updated})
 
 	case http.MethodDelete:
 		if err := h.service.DeleteBook(id); err != nil {
-			writeError(w, http.StatusBadRequest, err.Error())
+			transport.WriteError(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		writeJSON(w, http.StatusNoContent, map[string]string{"message": "el libro fue eliminado"})
+		transport.WriteJSON(w, http.StatusNoContent, map[string]string{"message": "el libro fue eliminado"})
 	default:
-		writeError(w, http.StatusMethodNotAllowed, "método no permitido")
+		transport.WriteError(w, http.StatusMethodNotAllowed, "método no permitido")
 	}
 }
